@@ -4,6 +4,13 @@ using UnityEngine;
 
 public class CharacterBase : MonoBehaviour
 {
+    protected Rigidbody2D myRigid;
+
+    protected virtual void Start()
+    {
+        myRigid = GetComponent<Rigidbody2D>();
+    }
+
     protected enum FSM{
         idle, move, attack, die, hit
     }
