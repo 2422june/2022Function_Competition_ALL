@@ -10,6 +10,7 @@ public class EnemyController : CharacterBase
     float h, forward = 1;
     Vector3 moveDir = Vector3.zero, playerPos;
 
+
     RaycastHit2D attackHit;
 
     protected override void Start()
@@ -20,9 +21,6 @@ public class EnemyController : CharacterBase
         curHp = maxHp;
         damage = 1;
 
-        myRenderer = GetComponent<SpriteRenderer>();
-        myAni = GetComponent<Animator>();
-
         moveSpeed = 2f;
     }
 
@@ -31,7 +29,6 @@ public class EnemyController : CharacterBase
         if(player == null)
         {
             state = FSM.idle;
-            myAni.SetBool("Attack", false);
         }
         else
         {
@@ -87,18 +84,8 @@ public class EnemyController : CharacterBase
 
             if (attack)
                 state = FSM.attack;
-
-            if (state != FSM.attack)
-            {
-                if (h == 0)
-                {
-                    state = FSM.idle;
-                }
-                else
-                {
-                    state = FSM.move;
-                }
-            }
+            else
+                state = FSM.move;
         }
 
         if (curHp != maxHp)
@@ -123,12 +110,19 @@ public class EnemyController : CharacterBase
     {
         if (!myAni.GetBool("Attack"))
         {
-            attackHit = Physics2D.Raycast(transform.position, Vector2.right * forward, 2f, LayerMask.GetMask("Player"));
-            if (attackHit.collider != null)
+            if(attack)
             {
-                attackHit.collider.GetComponent<PlayerController>().Hit(damage);
+                Vector3 AttackingPoint = transform.position;
+                AttackingPoint.y -= 1;
+                attackHit = Physics2D.Raycast(AttackingPoint, Vector2.right * forward, 5f, LayerMask.GetMask("Player"));
+                Debug.DrawRay(AttackingPoint, Vector2.right * forward);
+
+                if (attackHit.collider != null)
+                {
+                    attackHit.collider.GetComponent<PlayerController>().Hit(damage);
+                    myAni.SetBool("Attack", true);
+                }
             }
-            myAni.SetBool("Attack", true);
         }
         else if (myAni.GetCurrentAnimatorStateInfo(0).IsName("Attack") && myAni.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1)
         {

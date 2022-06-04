@@ -11,6 +11,8 @@ public class CharacterBase : MonoBehaviour
     protected virtual void Start()
     {
         myRigid = GetComponent<Rigidbody2D>();
+        myRenderer = GetComponent<SpriteRenderer>();
+        myAni = GetComponent<Animator>();
     }
 
     protected enum FSM{
@@ -51,7 +53,11 @@ public class CharacterBase : MonoBehaviour
 
     public virtual void Hit(float damage)
     {
-        curHp -= damage;
+        if(!myAni.GetCurrentAnimatorStateInfo(0).IsName("Hurt"))
+        {
+            myAni.SetTrigger("Hit");
+            curHp -= damage;
+        }
     }
 
     protected virtual void Idle()
